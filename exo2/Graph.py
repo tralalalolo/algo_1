@@ -3,13 +3,6 @@ import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
 
-a=[# 1  2  3  4
-    [0, 0, 0, 0], # node 1
-    [0, 0, 1, 0], # node 2
-    [0, 1, 0, 1], # node 3
-    [0, 0, 1, 0], # node 4
-]
-
 
 class Graph:
     def __init__(self, nodes, edges):
