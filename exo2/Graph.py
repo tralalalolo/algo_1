@@ -19,16 +19,20 @@ class Graph:
         done = 0
         while done < self.edges:
             x, y = self.rng.integers(0, self.nodes), self.rng.integers(0, self.nodes)
-            if x != y and matrix[x][y] == 0: # x != y : no loop
+            if x != y and matrix[x][y] == 0:  # x != y : no loop
                 done += 1
                 matrix[x][y] = 1
                 matrix[y][x] = 1
         return matrix
 
+    def __create_color(self):
+        vector = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
+        return '#' + ''.join(self.rng.choice(vector, 6))
+
     def __manage_color_space(self, new=False, unwanted_color=None):
         if new:
             while True:
-                n = self.rng.integers(0, 1000000)
+                n = self.__create_color()
                 if n not in self.color_space:
                     self.color_space.append(n)
                     return self.color_space[-1]
@@ -55,11 +59,11 @@ class Graph:
                 if edge >= 1:
                     deg += 1
             vertices_degree.append(deg)
+        print(vertices_degree)
         return vertices_degree
 
     def __welsh_powell(self):
         vertices_degree = self.__get_degree_from_matrix()
-        print(vertices_degree)
         matrix_color_space = [-1 for _ in range(0, self.nodes)]
         self.__reset_color_space()
         current_degree = max(vertices_degree)
@@ -85,8 +89,6 @@ class Graph:
         for i in range(0, len(matrix_color_space)):
             if matrix_color_space[i] == -1:
                 matrix_color_space[i] = self.__manage_color_space()
-        print(matrix_color_space)
-        print(self.color_space)
         return matrix_color_space
 
     def get_matrix(self):
@@ -95,21 +97,44 @@ class Graph:
     def get_color_matrix(self):
         return self.__welsh_powell(), self.color_space
 
+    def __create_picture_of_matrix(self, node_color):
+        G = nx.from_pandas_adjacency(self.get_matrix())
+        G.name = "Graph intermediate"
+        options = {
+            'node_color': node_color,
+            'width': 3,
+            'font_size': 8,
+            'with_labels': True,
+            'labels': make_dictionary(node_color)
+        }
+
+
+def make_dictionary(list_color):
+    result = {}
+    for i in range(0, len(list_color)):
+        result[i] = list_color[i] + ' node', i
+    return result
+
 
 if __name__ == '__main__':
+    pd.set_option("display.max_rows", None, "display.max_columns", None)
     a = Graph(edges=130, nodes=60)
-    a.get_color_matrix()
-    G = nx.from_pandas_adjacency(a.get_matrix())
+    node_color, color_space = a.get_color_matrix()
+    matrix = a.get_matrix()
+    G = nx.from_pandas_adjacency(matrix)
     G.name = "Graph from pandas adjacency matrix"
     print(nx.info(G))
+
+    print(matrix)
+    print(len(color_space), 'colors : ', color_space)
+    print(len(node_color), 'nodes colored, in order :', node_color)
     options = {
-        'node_color': 'black',
-        'node_size': 60,
+        'node_color': node_color,
         'width': 3,
         'font_size': 8,
+        'with_labels': True,
+        'labels': make_dictionary(node_color)
     }
-    # subax1 = plt.subplot(221)
-    plt.figure(3, figsize=(12, 12))
+    plt.figure(3, figsize=(20, 11.25))
     nx.draw(G, **options)
     plt.show()
-
