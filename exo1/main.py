@@ -74,6 +74,7 @@ def parcours(initial_state):
     new_state, cost = run(initial_state)
     print('Final Cost of annealing: ', cost)
     print(new_state)
+    return new_state
 
 
 if __name__ == '__main__':
